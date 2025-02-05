@@ -1,0 +1,53 @@
+import cv2
+import os
+
+lower_threshold = 70
+upper_threshold = 135
+
+def nothing(x):
+    pass
+
+def canny_edge_detection(frame, lower, upper):
+   
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    blurred = cv2.GaussianBlur(src=gray, ksize=(3, 5), sigmaX=0.5)
+    
+    edges = cv2.Canny(blurred, lower, upper)
+    
+    inverted_edges = cv2.bitwise_not(edges)
+    
+    return blurred, inverted_edges
+
+def main():
+    global lower_threshold, upper_threshold
+    
+    image_path = r"C:\Users\Abijith\Desktop\pythonprojects\trial.jpg" 
+    
+    frame = cv2.imread(image_path)
+    
+    if frame is None:
+        print(f"Error: Could not load image from {image_path}. Check the file path and integrity.")
+        return
+    
+    cv2.namedWindow("Canny Thresholds")
+    
+    cv2.createTrackbar("Lower", "Canny Thresholds", lower_threshold, 255, nothing)
+    cv2.createTrackbar("Upper", "Canny Thresholds", upper_threshold, 255, nothing)
+    
+    while True:
+        lower_threshold = cv2.getTrackbarPos("Lower", "Canny Thresholds")
+        upper_threshold = cv2.getTrackbarPos("Upper", "Canny Thresholds")
+        
+        blurred, inverted_edges = canny_edge_detection(frame, lower_threshold, upper_threshold)
+        
+        cv2.imshow("Blurred", blurred)
+        cv2.imshow("Inverted Edges", inverted_edges)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
